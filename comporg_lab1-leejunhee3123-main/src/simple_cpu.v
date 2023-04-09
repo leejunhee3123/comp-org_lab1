@@ -53,7 +53,8 @@ assign instruction = inst_memory[PC[7:2]]; // 64 inst
 // from register file 
 wire [31:0] rs1_out, rs2_out;
 wire [31:0] alu_out;
-
+wire [31:0] sextimm;
+wire [31:0] in_b;
 // 5 bits for each (because there exist 32 registers)
 wire [4:0] rs1, rs2, rd;
 
@@ -113,6 +114,13 @@ register_file m_register_file(
 
 ///////////////////////////////////////////////////////////////////////////////
 // TODO : Immediate Generator
+imm_generator m_imm_generator(
+  .instruction(instruction),
+
+  .sextimm(sextimm)
+);
+
+
 //////////////////////////////////////////////////////////////////////////////
 
 
@@ -136,8 +144,15 @@ wire [31:0] alu_in2;
 
 ///////////////////////////////////////////////////////////////////////////////
 // TODO : Need a fix
+mux_2x1 m_mux_2x1(
+  .select(alu_src),
+  .in1(rs2_out),
+  .in2(sextimm),
+  
+  .out(alu_in2)
+);
 //////////////////////////////////////////////////////////////////////////////
-assign alu_in2 = rs2_out;
+//assign alu_in2 = in_b;
 
 //////////////////////////////////////////////////////////////////////////////
 

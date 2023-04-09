@@ -22,7 +22,7 @@ reg [9:0] controls;
 always @(*) begin
   case (opcode)
     7'b0110011: controls = 10'b00_000_10_001; // R-type
-    
+    7'b0010011: controls = 10'b00_000_11_011; // I-type
     //////////////////////////////////////////////////////////////////////////
     // TODO : Implement signals for other instruction types
     //////////////////////////////////////////////////////////////////////////
