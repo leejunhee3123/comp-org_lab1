@@ -1,0 +1,9 @@
+[core]
+	repositoryformatversion = 0
+	filemode = false
+	bare = false
+	logallrefupdates = true
+	ignorecase = true
+[remote "origin"]
+	url = comporg_lab1-leejunhee3123-main
+	fetch = +refs/heads/*:refs/remotes/origin/*
