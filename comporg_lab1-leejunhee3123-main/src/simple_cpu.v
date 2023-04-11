@@ -217,7 +217,7 @@ mux_2x1 m_mux_2x1_2(
   .in1(alu_out),
   .in2(read_data),
   
-  .out(alu_in2)
+  .out(write_data)
 );
 
 ////////////////////////////////////////////////////
