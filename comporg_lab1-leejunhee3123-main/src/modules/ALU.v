@@ -34,6 +34,9 @@ always @(*) begin
     `OP_SRA: result = $signed(in_a) >>> in_b[4:0];
     `OP_SLT: result = ($signed(in_a) < $signed(in_b)) ? 1 : 0;
     `OP_SLTU: result = (in_a < in_b) ? 1 : 0;
+    `OP_SUB_NE:  result = in_a -  in_b;
+    `OP_SUB_LT:  result = in_a -  in_b;
+    `OP_SUB_GE:  result = in_a -  in_b;
     //////////////////////////////////////////////////////////////////////////
     default:  result = 32'h0000_0000;
   endcase
@@ -44,7 +47,26 @@ always @(*) begin
   case (alu_func)
     //////////////////////////////////////////////////////////////////////////
     // TODO : Generate check signal
-    `OP_SUB: check = !(result);
+    `OP_SUB: begin
+              if (result == 32'h0000_0000) begin
+                  check=1'b1;
+              end
+            end
+    `OP_SUB_NE: begin
+              if (result != 32'h0000_0000) begin
+                  check=1'b1;
+              end
+            end
+    `OP_SUB_LT: begin
+              if (result[31] == 1) begin
+                  check=1'b1;
+              end
+            end
+    `OP_SUB_GE: begin
+              if (result >= 32'h0000_0000) begin
+                  check=1'b1;
+              end
+            end
     //////////////////////////////////////////////////////////////////////////
     default:  check = 1'b0;
   endcase
