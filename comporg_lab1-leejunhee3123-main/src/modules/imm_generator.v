@@ -16,6 +16,8 @@ always @(*) begin
     //////////////////////////////////////////////////////////////////////////
     // TODO : Generate sextimm using instruction
     7'b0010011 : sextimm = $signed(instruction[31:20]);
+    7'b0000011 : sextimm = $signed(instruction[31:20]);
+    7'b0100011 : sextimm = $signed({instruction[31:25],instruction[11:7]});
     //////////////////////////////////////////////////////////////////////////
     default:    sextimm = 32'h0000_0000;
   endcase

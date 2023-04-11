@@ -205,7 +205,7 @@ data_memory m_data_memory(
   .mem_write(mem_write),
   .mem_read(mem_read),
   .maskmode(maskmode),
-  .sext(1'b0),
+  .sext(funct3[2]),
   .address(alu_out),
   .write_data(rs2_out),
 
