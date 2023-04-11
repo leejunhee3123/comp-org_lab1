@@ -26,8 +26,13 @@ module data_memory #(
   always @(negedge clk) begin 
     if (mem_write == 1'b1) begin
       ////////////////////////////////////////////////////////////////////////
-      // TODO : Perform writes (select certain bits from write_data
+      // TODO : Perform writes (select certain bits from write_data)
       // according to maskmode
+      case (maskmode)
+        2'b00: mem_array[address][7:0]=write_data[7:0];
+        2'b01: mem_array[address][15:0]=write_data[15:0];
+        2'b10: mem_array[address][31:0]=write_data[31:0];
+      endcase
       ////////////////////////////////////////////////////////////////////////
     end
   end
