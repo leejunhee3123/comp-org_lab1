@@ -25,7 +25,9 @@ always @(*) begin
     7'b0010011: controls = 10'b00_000_11_011; // I-type
     7'b0000011: controls = 10'b00_011_00_011; // I-type_load
     7'b0100011: controls = 10'b00_001_00_110; // S-type
-    7'b1100011: controls = 10'b00_100_01_010; // B-type
+    7'b1100011: controls = 10'b00_100_01_000; // B-type
+    7'b1101111: controls = 10'b10_000_00_001; // jal-type
+    7'b1100111: controls = 10'b11_000_00_001; // jalr-type
     //////////////////////////////////////////////////////////////////////////
     // TODO : Implement signals for other instruction types
     //////////////////////////////////////////////////////////////////////////

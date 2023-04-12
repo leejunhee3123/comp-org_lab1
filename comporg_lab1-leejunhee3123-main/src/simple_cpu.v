@@ -196,14 +196,32 @@ adder m_pc_branch_adder(
 
   .result(PC_BRANCH)
 );
+wire [31:0] branch_out;
+wire [31:0] jalr_out;
+
+adder m_adder_for_jalr(
+  .in_a(32'h0000_0004),
+  .in_b(rs1_out),
+
+  .result(jalr_out)
+);
 mux_2x1 m_mux_2x1_branch(
   .select(taken),
   .in1(PC_PLUS_4),
   .in2(PC_BRANCH),
   
-  .out(NEXT_PC)
+  .out(branch_out)
 );
 
+mux_4x1 m_mux_4x1(
+  .select(jump),
+  .in1(branch_out),
+  .in2(branch_out),
+  .in3(PC_BRANCH),
+  .in4(jalr_out),
+  
+  .out(NEXT_PC)
+);
 //////////////////////////////////////////////////////////////////////////////
 //assign NEXT_PC = PC_PLUS_4;
 

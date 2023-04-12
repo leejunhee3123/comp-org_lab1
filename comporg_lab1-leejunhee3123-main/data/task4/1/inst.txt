@@ -1,5 +1,5 @@
 add x16, x1, x2
-beq x0, x1, 12
+beq x0, x2, 12
 add x17, x1, x2
 bne x0, x0, 12
 add x18, x1, x2

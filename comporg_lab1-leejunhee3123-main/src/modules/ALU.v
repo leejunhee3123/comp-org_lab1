@@ -49,7 +49,7 @@ always @(*) begin
     // TODO : Generate check signal
     `OP_SUB: check= (result==32'h0000_0000);
     `OP_SUB_NE: check = result;
-    `OP_SLT: check= !result;
+    `OP_SLT: check= result;
     `OP_SLT_N: check= result;
     `OP_SLTU: check= result;
     `OP_SLTU_N: check= result;
