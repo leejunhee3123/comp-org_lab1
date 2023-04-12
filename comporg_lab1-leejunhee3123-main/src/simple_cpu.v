@@ -13,26 +13,6 @@ module simple_cpu
 ////////////////////////////////////////////////////
 
 
-/* m_next_pc_adder */
-wire [DATA_WIDTH-1:0] PC_PLUS_4;
-reg [DATA_WIDTH-1:0] PC;    // program counter (32 bits)
-
-adder m_next_pc_adder(
-  .in_a(PC),
-  .in_b(32'h0000_0004),
-
-  .result(PC_PLUS_4)
-);
-
-/* pc: update program counter */
-wire [DATA_WIDTH-1:0] NEXT_PC;
-
-always @(posedge clk) begin
-  if (rstn == 1'b0) PC <= 32'h00000000;
-  else PC <= NEXT_PC;
-end
-
-
 /* inst_memory: memory where instruction lies */
 localparam NUM_INSTS = 64;
 
@@ -190,6 +170,25 @@ branch_control m_branch_control(
 ///////////////////////////////////////////////////////////////////////////////
 // TODO : Currently, NEXT_PC is always PC_PLUS_4. Using adders and muxes & 
 // control signals, compute & assign the correct NEXT_PC.
+/* m_next_pc_adder */
+wire [DATA_WIDTH-1:0] PC_PLUS_4;
+reg [DATA_WIDTH-1:0] PC;    // program counter (32 bits)
+
+adder m_next_pc_adder(
+  .in_a(PC),
+  .in_b(32'h0000_0004),
+
+  .result(PC_PLUS_4)
+);
+
+/* pc: update program counter */
+wire [DATA_WIDTH-1:0] NEXT_PC;
+
+always @(posedge clk) begin
+  if (rstn == 1'b0) PC <= 32'h00000000;
+  else PC <= NEXT_PC;
+end
+
 wire [DATA_WIDTH-1:0] PC_BRANCH;
 adder m_pc_branch_adder(
   .in_a(PC),
