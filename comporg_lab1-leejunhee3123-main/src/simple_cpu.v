@@ -111,6 +111,7 @@ imm_generator m_imm_generator(
 
 /* m_ALU_control: ALU control unit */
 wire [3:0] alu_func;
+wire [31:0] alu_in2;
 
 ALU_control m_ALU_control(
   .alu_op(alu_op), 
@@ -119,8 +120,6 @@ ALU_control m_ALU_control(
 
   .alu_func(alu_func)
 );
-
-wire [31:0] alu_in2;
 
 ///////////////////////////////////////////////////////////////////////////////
 // TODO : Need a fix
@@ -132,7 +131,6 @@ mux_2x1 m_mux_2x1(
   .out(alu_in2)
 );
 //////////////////////////////////////////////////////////////////////////////
-//assign alu_in2 = in_b;
 
 //////////////////////////////////////////////////////////////////////////////
 
@@ -200,7 +198,7 @@ wire [31:0] branch_out;
 wire [31:0] jalr_out;
 
 adder m_adder_for_jalr(
-  .in_a(32'h0000_0004),
+  .in_a(sextimm),
   .in_b(rs1_out),
 
   .result(jalr_out)
@@ -243,15 +241,23 @@ data_memory m_data_memory(
 
   .read_data(read_data)
 );
+wire[31:0] write_data_;
 //////////////////////////////////////////////////////////////////////////////
 mux_2x1 m_mux_2x1_2(
   .select(mem_to_reg),
   .in1(alu_out),
   .in2(read_data),
   
-  .out(write_data)
+  .out(write_data_)
 );
 
+mux_2x1 m_mux_2x1_3(
+  .select(jump[1]),
+  .in1(write_data_),
+  .in2(PC_PLUS_4),
+  
+  .out(write_data)
+);
 ////////////////////////////////////////////////////
 // Write Back (WB) 
 ////////////////////////////////////////////////////
