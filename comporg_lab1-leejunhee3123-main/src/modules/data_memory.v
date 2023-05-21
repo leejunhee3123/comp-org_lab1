@@ -13,6 +13,8 @@ module data_memory #(
 
   output reg [DATA_WIDTH-1:0] read_data
 );
+wire [3:0] funct3;
+assign funct3 = {sext, maskmode};
 
   // memory
   reg [DATA_WIDTH-1:0] mem_array [0:2**MEM_ADDR_SIZE-1]; // change memory size
@@ -26,8 +28,13 @@ module data_memory #(
   always @(negedge clk) begin 
     if (mem_write == 1'b1) begin
       ////////////////////////////////////////////////////////////////////////
-      // TODO : Perform writes (select certain bits from write_data
+      // TODO : Perform writes (select certain bits from write_data)
       // according to maskmode
+      case (maskmode)
+        2'b00: mem_array[address_internal][7:0]=write_data[7:0];
+        2'b01: mem_array[address_internal][15:0]=write_data[15:0];
+        2'b10: mem_array[address_internal][31:0]=write_data[31:0];
+      endcase
       ////////////////////////////////////////////////////////////////////////
     end
   end
@@ -37,6 +44,14 @@ module data_memory #(
     if (mem_read == 1'b1) begin
       ////////////////////////////////////////////////////////////////////////
       // TODO : Perform reads (select bits according to sext & maskmode)
+      case (funct3)
+        3'b0_00: read_data=$signed(mem_array[address_internal][7:0]);
+        3'b0_01: read_data=$signed(mem_array[address_internal][15:0]);
+        3'b0_10: read_data=$signed(mem_array[address_internal][31:0]);
+        3'b1_00: read_data=mem_array[address_internal][7:0];
+        3'b1_01: read_data=mem_array[address_internal][15:0];
+        default: read_data = 32'h0000_0000;
+      endcase
       ////////////////////////////////////////////////////////////////////////
     end else begin
       read_data = 32'h0000_0000;

@@ -50,7 +50,15 @@ always @(*) begin
     2'b01: begin
       ///////////////////////////////////////////////////////////////////////
       // TODO : select operation for branches
-      alu_func = `OP_SUB;
+      case(funct3)
+        3'b000: alu_func = `OP_SUB;
+        3'b001: alu_func = `OP_SUB_NE;
+        3'b100: alu_func = `OP_SLT;
+        3'b101: alu_func = `OP_SLT_N;
+        3'b110: alu_func = `OP_SLTU;
+        3'b111: alu_func = `OP_SLTU_N;
+        default: alu_func = `OP_EEE;
+      endcase
       ///////////////////////////////////////////////////////////////////////
     end
     2'b10: begin                // R-types

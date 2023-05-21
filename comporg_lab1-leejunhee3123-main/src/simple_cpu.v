@@ -13,26 +13,6 @@ module simple_cpu
 ////////////////////////////////////////////////////
 
 
-/* m_next_pc_adder */
-wire [DATA_WIDTH-1:0] PC_PLUS_4;
-reg [DATA_WIDTH-1:0] PC;    // program counter (32 bits)
-
-adder m_next_pc_adder(
-  .in_a(PC),
-  .in_b(32'h0000_0004),
-
-  .result(PC_PLUS_4)
-);
-
-/* pc: update program counter */
-wire [DATA_WIDTH-1:0] NEXT_PC;
-
-always @(posedge clk) begin
-  if (rstn == 1'b0) PC <= 32'h00000000;
-  else PC <= NEXT_PC;
-end
-
-
 /* inst_memory: memory where instruction lies */
 localparam NUM_INSTS = 64;
 
@@ -131,6 +111,7 @@ imm_generator m_imm_generator(
 
 /* m_ALU_control: ALU control unit */
 wire [3:0] alu_func;
+wire [31:0] alu_in2;
 
 ALU_control m_ALU_control(
   .alu_op(alu_op), 
@@ -139,8 +120,6 @@ ALU_control m_ALU_control(
 
   .alu_func(alu_func)
 );
-
-wire [31:0] alu_in2;
 
 ///////////////////////////////////////////////////////////////////////////////
 // TODO : Need a fix
@@ -152,7 +131,6 @@ mux_2x1 m_mux_2x1(
   .out(alu_in2)
 );
 //////////////////////////////////////////////////////////////////////////////
-//assign alu_in2 = in_b;
 
 //////////////////////////////////////////////////////////////////////////////
 
@@ -190,28 +168,96 @@ branch_control m_branch_control(
 ///////////////////////////////////////////////////////////////////////////////
 // TODO : Currently, NEXT_PC is always PC_PLUS_4. Using adders and muxes & 
 // control signals, compute & assign the correct NEXT_PC.
+/* m_next_pc_adder */
+wire [DATA_WIDTH-1:0] PC_PLUS_4;
+reg [DATA_WIDTH-1:0] PC;    // program counter (32 bits)
+
+adder m_next_pc_adder(
+  .in_a(PC),
+  .in_b(32'h0000_0004),
+
+  .result(PC_PLUS_4)
+);
+
+/* pc: update program counter */
+wire [DATA_WIDTH-1:0] NEXT_PC;
+
+always @(posedge clk) begin
+  if (rstn == 1'b0) PC <= 32'h00000000;
+  else PC <= NEXT_PC;
+end
+
+wire [DATA_WIDTH-1:0] PC_BRANCH;
+adder m_pc_branch_adder(
+  .in_a(PC),
+  .in_b(sextimm),
+
+  .result(PC_BRANCH)
+);
+wire [31:0] branch_out;
+wire [31:0] jalr_out;
+
+adder m_adder_for_jalr(
+  .in_a(sextimm),
+  .in_b(rs1_out),
+
+  .result(jalr_out)
+);
+mux_2x1 m_mux_2x1_branch(
+  .select(taken),
+  .in1(PC_PLUS_4),
+  .in2(PC_BRANCH),
+  
+  .out(branch_out)
+);
+
+mux_4x1 m_mux_4x1(
+  .select(jump),
+  .in1(branch_out),
+  .in2(branch_out),
+  .in3(PC_BRANCH),
+  .in4(jalr_out),
+  
+  .out(NEXT_PC)
+);
 //////////////////////////////////////////////////////////////////////////////
-assign NEXT_PC = PC_PLUS_4;
+//assign NEXT_PC = PC_PLUS_4;
 
 
 ///////////////////////////////////////////////////////////////////////////////
 // TODO : Feed the appropriate inputs to the data memory
+wire [1:0] maskmode ;
+assign maskmode = funct3[1:0];
 //////////////////////////////////////////////////////////////////////////////
 /* m_data_memory: data memory */
 data_memory m_data_memory(
   .clk(clk),
   .mem_write(mem_write),
   .mem_read(mem_read),
-  .maskmode(2'b00),
-  .sext(1'b0),
-  .address(32'b0),
-  .write_data(32'b0),
+  .maskmode(maskmode),
+  .sext(funct3[2]),
+  .address(alu_out),
+  .write_data(rs2_out),
 
   .read_data(read_data)
 );
+wire[31:0] write_data_;
 //////////////////////////////////////////////////////////////////////////////
+mux_2x1 m_mux_2x1_2(
+  .select(mem_to_reg),
+  .in1(alu_out),
+  .in2(read_data),
+  
+  .out(write_data_)
+);
 
-
+mux_2x1 m_mux_2x1_3(
+  .select(jump[1]),
+  .in1(write_data_),
+  .in2(PC_PLUS_4),
+  
+  .out(write_data)
+);
 ////////////////////////////////////////////////////
 // Write Back (WB) 
 ////////////////////////////////////////////////////
@@ -219,7 +265,7 @@ data_memory m_data_memory(
 ///////////////////////////////////////////////////////////////////////////////
 // TODO : Need a fix
 //////////////////////////////////////////////////////////////////////////////
-assign write_data = alu_out;
+//assign write_data = alu_out;
 
 //////////////////////////////////////////////////////////////////////////////
 endmodule
